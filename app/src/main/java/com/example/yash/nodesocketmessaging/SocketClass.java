@@ -1,6 +1,5 @@
 package com.example.yash.nodesocketmessaging;
 
-import android.app.Activity;
 import android.util.Log;
 
 import com.github.nkzawa.emitter.Emitter;
@@ -9,9 +8,6 @@ import com.github.nkzawa.socketio.client.Socket;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Created by Yash on 17-02-2018.
