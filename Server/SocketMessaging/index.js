@@ -14,23 +14,16 @@ app.get('/',function(req,res){
 })
 
 io.on('connection',function(socket){
-	allOn(socket);
-	allEmit(socket);
+	allListners(socket);
+	allEmiters(socket);
 })
 
 
-function allOn(socket){
+function allListners(socket){
 
-	socket.on('message',function(data){	
+	socket.on('privateMessage',function(data){	
 		var sockets = io.sockets.sockets;
-		// sockets.forEach(function(soc){
-		// 	if(soc.id != socket.id){
-		// 		soc.emit('message',data);
-		// 	}
-		// })
-		// console.log(data.text + " ,from:= "+socket.id);
-		socket.broadcast.emit('message',data);
-		// socket.emit('message',data);
+		socket.broadcast.emit('privateMessage',data);
 	});
 
 	socket.on('connectedDone',function(data){
@@ -51,7 +44,7 @@ function allOn(socket){
 
 }
 
-function allEmit(socket){	
+function allEmiters(socket){	
 
 	socket.emit('connected',{"info":socket.id});
 	console.log("Yo Connected "+socket.id);

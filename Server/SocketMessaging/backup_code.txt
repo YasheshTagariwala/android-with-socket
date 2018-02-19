@@ -1,0 +1,14 @@
+socket.on('message',function(data){	
+		var sockets = io.sockets.sockets;
+		// sockets.forEach(function(soc){
+		// 	if(soc.id != socket.id){
+		// 		soc.emit('message',data);
+		// 	}
+		// })
+		// console.log(data.text + " ,from:= "+socket.id);
+		socket.broadcast.emit('message',data);
+		// socket.emit('message',data);
+	});
+
+
+
