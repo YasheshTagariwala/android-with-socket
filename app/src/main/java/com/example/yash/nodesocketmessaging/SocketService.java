@@ -1,40 +1,33 @@
 package com.example.yash.nodesocketmessaging;
 
-import android.app.Service;
-import android.content.Intent;
-import android.os.IBinder;
+import android.app.job.JobParameters;
+import android.app.job.JobService;
+import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 
-public class SocketService extends Service {
-
-    SocketClass socketClass;
-
-    @Override
-    public void onCreate() {
-        super.onCreate();
-    }
+public class SocketService extends JobService {
+    SocketClass socketClass = new SocketClass();
 
     @Override
-    public IBinder onBind(Intent intent) {
-        throw new UnsupportedOperationException("Not Yet Implemented");
-    }
-
-    @Override
-    public int onStartCommand(Intent intent, int flags, int startId) {
-        super.onStartCommand(intent, flags, startId);
-        connectSocketAndInitialize();
-        return START_STICKY;
-    }
-
-    public void connectSocketAndInitialize() {
-        socketClass = new SocketClass();
-        if (!SocketClass.getSocket().connected()) {
-            socketClass.SocketInitialize();
+    public boolean onStartJob(JobParameters jobParameters) {
+        if (isNetworkAvailable()) {
+            if (SocketClass.getSocket().connected()) {
+                socketClass.SocketInitialize();
+            }
         }
+        return false;
     }
 
     @Override
-    public void onDestroy() {
-        super.onDestroy();
+    public boolean onStopJob(JobParameters jobParameters) {
         socketClass.disconnectSocket();
+        return false;
+    }
+
+    public boolean isNetworkAvailable() {
+        ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
+        return networkInfo != null && networkInfo.isConnected();
     }
 }

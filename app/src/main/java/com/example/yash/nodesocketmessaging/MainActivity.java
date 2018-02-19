@@ -1,5 +1,8 @@
 package com.example.yash.nodesocketmessaging;
 
+import android.app.job.JobInfo;
+import android.app.job.JobScheduler;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -35,8 +38,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        socketService = new Intent(this, SocketService.class);
-        startService(socketService);
+        checkScheduler();
         startUp();
     }
 
@@ -60,7 +62,7 @@ public class MainActivity extends AppCompatActivity {
         mInputMessageView.setText("");
         addMessage(message);
         try {
-            SocketClass.getSocket().emit("message", new JSONObject().put("text", message));
+            SocketClass.getSocket().emit("privateMessage", new JSONObject().put("text", message));
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -72,7 +74,7 @@ public class MainActivity extends AppCompatActivity {
             sendData.put("image", encodeImage(path));
             Bitmap bmp = decodeImage(sendData.getString("image"));
             addImage(bmp);
-            SocketClass.getSocket().emit("message", sendData);
+            SocketClass.getSocket().emit("privateMessage", sendData);
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -119,5 +121,20 @@ public class MainActivity extends AppCompatActivity {
 
     protected void onDestroy() {
         super.onDestroy();
+    }
+
+    private void checkScheduler() {
+        JobScheduler jobScheduler = (JobScheduler) getSystemService(Context.JOB_SCHEDULER_SERVICE);
+        boolean hasBeenScheduled = false;
+        for (JobInfo jobInfo : jobScheduler.getAllPendingJobs()) {
+            if (jobInfo.getId() == JobSchedulerUtils.JOB_ID) {
+                hasBeenScheduled = true;
+                break;
+            }
+        }
+
+        if (!hasBeenScheduled) {
+            JobSchedulerUtils.scheduleJob(getApplicationContext());
+        }
     }
 }

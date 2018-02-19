@@ -31,10 +31,34 @@ public class SocketClass {
 
     public void SocketInitialize() {
         socket.connect();
-        socket.on("message", handleIncomingMessages);
+        socket.on("privateMessage", handleIncomingPrivateMessages);
+        socket.on("groupMessage", handleIncomingGroupMessages);
         socket.on("connected", showConnectedInfo);
         socket.on("ping", heartBeat);
     }
+
+    private Emitter.Listener handleIncomingGroupMessages = new Emitter.Listener() {
+        @Override
+        public void call(final Object... args) {
+            class GroupMessage extends AsyncTask {
+                @Override
+                protected Object doInBackground(Object[] objects) {
+                    try {
+                        MainActivity.addMessage(((JSONObject) args[0]).getString("text"));
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                    try {
+                        MainActivity.addImage(MainActivity.decodeImage(((JSONObject) args[0]).getString("image")));
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                    return null;
+                }
+            }
+            new GroupMessage().execute();
+        }
+    };
 
     private Emitter.Listener heartBeat = new Emitter.Listener() {
         @Override
@@ -44,7 +68,7 @@ public class SocketClass {
                 protected Object doInBackground(Object[] objects) {
                     try {
                         Log.e("HeartBeat", ((JSONObject) args[0]).getString("beat"));
-                        socket.emit("heartbeat", "beating");
+//                        socket.emit("heartbeat", "beating");
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -55,7 +79,7 @@ public class SocketClass {
         }
     };
 
-    private Emitter.Listener handleIncomingMessages = new Emitter.Listener() {
+    private Emitter.Listener handleIncomingPrivateMessages = new Emitter.Listener() {
         @Override
         public void call(final Object... args) {
             class IncomingMessage extends AsyncTask {
