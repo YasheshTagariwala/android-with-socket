@@ -12,6 +12,7 @@ server.listen(3000,function(){
 app.get('/',function(req,res){
 	res.sendFile(__dirname+'/index.html');
 })
+
 io.on('connection',function(socket){
 	allOn(socket);
 	allEmit(socket);
