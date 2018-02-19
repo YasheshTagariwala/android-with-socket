@@ -32,8 +32,6 @@ public class MainActivity extends AppCompatActivity {
     private static List<Message> mMessages = new ArrayList<>();
     private static RecyclerView.Adapter mAdapter;
 
-    Intent socketService;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
