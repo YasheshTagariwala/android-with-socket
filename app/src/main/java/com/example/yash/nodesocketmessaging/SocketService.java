@@ -28,7 +28,7 @@ public class SocketService extends Service {
     public void connectSocketAndInitialize() {
         socketClass = new SocketClass();
         if (!SocketClass.getSocket().connected()) {
-            socketClass.SocketIntialize();
+            socketClass.SocketInitialize();
         }
     }
 

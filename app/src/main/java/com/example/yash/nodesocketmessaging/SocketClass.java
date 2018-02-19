@@ -1,5 +1,6 @@
 package com.example.yash.nodesocketmessaging;
 
+import android.os.AsyncTask;
 import android.util.Log;
 
 import com.github.nkzawa.emitter.Emitter;
@@ -28,7 +29,7 @@ public class SocketClass {
         }
     }
 
-    public void SocketIntialize() {
+    public void SocketInitialize() {
         socket.connect();
         socket.on("message", handleIncomingMessages);
         socket.on("connected", showConnectedInfo);
@@ -38,27 +39,28 @@ public class SocketClass {
     private Emitter.Listener heartBeat = new Emitter.Listener() {
         @Override
         public void call(final Object... args) {
-            Thread thread = new Thread() {
+            class HeartBeat extends AsyncTask {
                 @Override
-                public void run() {
+                protected Object doInBackground(Object[] objects) {
                     try {
                         Log.e("HeartBeat", ((JSONObject) args[0]).getString("beat"));
                         socket.emit("heartbeat", "beating");
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
+                    return null;
                 }
-            };
-            thread.start();
+            }
+            new HeartBeat().execute();
         }
     };
 
     private Emitter.Listener handleIncomingMessages = new Emitter.Listener() {
         @Override
         public void call(final Object... args) {
-            Thread thread = new Thread() {
+            class IncomingMessage extends AsyncTask {
                 @Override
-                public void run() {
+                protected Object doInBackground(Object[] objects) {
                     try {
                         MainActivity.addMessage(((JSONObject) args[0]).getString("text"));
                     } catch (JSONException e) {
@@ -69,18 +71,19 @@ public class SocketClass {
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
+                    return null;
                 }
-            };
-            thread.start();
+            }
+            new IncomingMessage().execute();
         }
     };
 
     private Emitter.Listener showConnectedInfo = new Emitter.Listener() {
         @Override
         public void call(final Object... args) {
-            Thread thread = new Thread() {
+            class ShowConnected extends AsyncTask {
                 @Override
-                public void run() {
+                protected Object doInBackground(Object[] objects) {
                     try {
                         JSONObject data = new JSONObject();
                         data.put("email", "yashesh@gamil.com");
@@ -90,9 +93,10 @@ public class SocketClass {
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
+                    return null;
                 }
-            };
-            thread.start();
+            }
+            new ShowConnected().execute();
         }
     };
 
