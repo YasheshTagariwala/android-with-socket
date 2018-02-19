@@ -4,7 +4,6 @@ package com.example.yash.nodesocketmessaging;
  * Created by Yash on 17-02-2018.
  */
 
-import android.content.Context;
 import android.graphics.Bitmap;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
