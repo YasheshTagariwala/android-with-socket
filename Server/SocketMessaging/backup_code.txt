@@ -12,3 +12,50 @@ socket.on('message',function(data){
 
 
 
+
+	function test(){
+        for(var i=0;i<users_list.length;i++){
+            console.log("printing");
+            console.log(users_list[i]);
+        }
+	}
+
+	setTimeout(test,1000);
+
+
+
+
+
+	// sending to sender-client only
+     socket.emit('message', "this is a test");
+
+     // sending to all clients, include sender
+     io.emit('message', "this is a test");
+
+     // sending to all clients except sender
+     socket.broadcast.emit('message', "this is a test");
+
+     // sending to all clients in 'game' room(channel) except sender
+     socket.broadcast.to('game').emit('message', 'nice game');
+
+     // sending to all clients in 'game' room(channel), include sender
+     io.in('game').emit('message', 'cool game');
+
+     // sending to sender client, only if they are in 'game' room(channel)
+     socket.to('game').emit('message', 'enjoy the game');
+
+     // sending to all clients in namespace 'myNamespace', include sender
+     io.of('myNamespace').emit('message', 'gg');
+
+     // sending to individual socketid
+     socket.broadcast.to(socketid).emit('message', 'for your eyes only');
+
+
+
+     The easiest way rather than sending directly to the socket, would be creating a room for the 2 users to use and just send messages freely in there.
+
+     socket.join('some-unique-room-name'); // Do this for both users you want to chat with each other
+     socket.broadcast.to('the-unique-room-name').emit('message', 'blah'); // Send a message to the chat room.
+     Otherwise, you're going to need to keep track of each individual clients socket connection, and when you want to chat you'll have to look up that sockets connection and emit specifically to that one using the function I said above. Rooms are probably easier.
+
+
