@@ -11,6 +11,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Base64;
+import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -36,7 +37,9 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        checkScheduler();
+//        checkScheduler();
+        SocketClass socketClass = new SocketClass();
+        socketClass.SocketInitialize();
         startUp();
     }
 
@@ -60,7 +63,11 @@ public class MainActivity extends AppCompatActivity {
         mInputMessageView.setText("");
         addMessage(message);
         try {
-            SocketClass.getSocket().emit("privateMessage", new JSONObject().put("text", message));
+            JSONObject data = new JSONObject();
+            data.put("to", "yashesh@gmail.com");
+            data.put("from", "yashesh@gmail.com");
+            data.put("message", message);
+            SocketClass.getSocket().emit("privateMessageEmit", data.toString());
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -82,7 +89,7 @@ public class MainActivity extends AppCompatActivity {
         mMessages.add(new Message.Builder(Message.TYPE_MESSAGE).message(message).build());
         mAdapter = new MessageAdapter(mMessages);
         mAdapter.notifyItemInserted(0);
-        scrollToBottom();
+//        scrollToBottom();
     }
 
 

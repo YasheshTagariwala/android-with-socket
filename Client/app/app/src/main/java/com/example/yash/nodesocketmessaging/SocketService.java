@@ -5,6 +5,7 @@ import android.app.job.JobService;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.util.Log;
 
 public class SocketService extends JobService {
     SocketClass socketClass = new SocketClass();
@@ -12,9 +13,7 @@ public class SocketService extends JobService {
     @Override
     public boolean onStartJob(JobParameters jobParameters) {
         if (isNetworkAvailable()) {
-            if (SocketClass.getSocket().connected()) {
-                socketClass.SocketInitialize();
-            }
+//            socketClass.SocketInitialize();
         }
         return false;
     }

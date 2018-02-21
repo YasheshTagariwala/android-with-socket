@@ -7,6 +7,7 @@ import com.github.nkzawa.emitter.Emitter;
 import com.github.nkzawa.socketio.client.IO;
 import com.github.nkzawa.socketio.client.Socket;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -18,8 +19,9 @@ public class SocketClass {
 
     public static Socket socket;
     private static String PROTOCOL = "http://";
-    private static String SERVER_ADDRESS = "192.168.31.193";
+    private static String SERVER_ADDRESS = "192.168.31.32";
     private static int SERVER_PORT = 3000;
+    private int info = 1;
 
     public SocketClass() {
         try {
@@ -31,7 +33,7 @@ public class SocketClass {
 
     public void SocketInitialize() {
         socket.connect();
-        socket.on("privateMessage", handleIncomingPrivateMessages);
+        socket.on("privateMessageGet", handleIncomingPrivateMessages);
         socket.on("groupMessage", handleIncomingGroupMessages);
         socket.on("connected", showConnectedInfo);
         socket.on("ping", heartBeat);
@@ -109,11 +111,15 @@ public class SocketClass {
                 @Override
                 protected Object doInBackground(Object[] objects) {
                     try {
-                        JSONObject data = new JSONObject();
-                        data.put("email", "yashesh@gamil.com");
-                        data.put("user_name", "yashesh");
-                        data.put("socket_id", ((JSONObject) args[0]).getString("info"));
-                        socket.emit("connectedDone", data.toString());
+                        if (info == 1) {
+                            info = 2;
+                            JSONObject data = new JSONObject();
+                            JSONObject object = new JSONObject();
+                            object.put("user_name", "yashesh");
+                            object.put("socket_id", ((JSONObject) args[0]).getString("info"));
+                            data.put("yashesh@gmail.com", object);
+                            socket.emit("connectedDone", data.toString());
+                        }
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
