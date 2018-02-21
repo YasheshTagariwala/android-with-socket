@@ -14,12 +14,12 @@ app.get('/',function(req,res){
 })
 
 io.on('connection',function(socket){
-	allListners(socket);
-	allEmiters(socket);
+	allListeners(socket);
+	allEmitters(socket);
 })
 
 
-function allListners(socket){
+function allListeners(socket){
 
 	socket.on('privateMessage',function(data){	
 		var sockets = io.sockets.sockets;
@@ -44,7 +44,7 @@ function allListners(socket){
 
 }
 
-function allEmiters(socket){	
+function allEmitters(socket){
 
 	socket.emit('connected',{"info":socket.id});
 	console.log("Yo Connected "+socket.id);
