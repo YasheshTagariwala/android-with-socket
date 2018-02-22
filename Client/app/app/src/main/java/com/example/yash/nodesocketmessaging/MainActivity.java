@@ -32,6 +32,7 @@ public class MainActivity extends AppCompatActivity {
     private static RecyclerView mMessagesView;
     private static List<Message> mMessages = new ArrayList<>();
     private static RecyclerView.Adapter mAdapter;
+    private static MainActivity mainActivity;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,6 +45,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void startUp() {
+        mainActivity = (MainActivity) this;
         mMessagesView = findViewById(R.id.message_recycle);
         mMessagesView.setLayoutManager(new LinearLayoutManager(this));
         mAdapter = new MessageAdapter(mMessages);
@@ -64,8 +66,12 @@ public class MainActivity extends AppCompatActivity {
         addMessage(message);
         try {
             JSONObject data = new JSONObject();
+//            data.put("to", "fenil@gmail.com");
+//            data.put("from", "hemin@gmail.com");
+//            data.put("to", "fenil@gmail.com");
+//            data.put("from", "yashesh@gmail.com");
             data.put("to", "yashesh@gmail.com");
-            data.put("from", "yashesh@gmail.com");
+            data.put("from", "fenil@gmail.com");
             data.put("message", message);
             SocketClass.getSocket().emit("privateMessageEmit", data.toString());
         } catch (JSONException e) {
@@ -89,7 +95,7 @@ public class MainActivity extends AppCompatActivity {
         mMessages.add(new Message.Builder(Message.TYPE_MESSAGE).message(message).build());
         mAdapter = new MessageAdapter(mMessages);
         mAdapter.notifyItemInserted(0);
-//        scrollToBottom();
+        scrollToBottom();
     }
 
 
@@ -101,7 +107,12 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private static void scrollToBottom() {
-        mMessagesView.scrollToPosition(mAdapter.getItemCount() - 1);
+        mainActivity.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                mMessagesView.scrollToPosition(mAdapter.getItemCount() - 1);
+            }
+        });
     }
 
     private String encodeImage(String path) {
@@ -139,6 +150,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         if (!hasBeenScheduled) {
+            Log.e("yo", "YO");
             JobSchedulerUtils.scheduleJob(getApplicationContext());
         }
     }

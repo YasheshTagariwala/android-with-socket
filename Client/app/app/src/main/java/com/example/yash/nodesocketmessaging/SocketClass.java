@@ -114,10 +114,13 @@ public class SocketClass {
                         if (info == 1) {
                             info = 2;
                             JSONObject data = new JSONObject();
-                            JSONObject object = new JSONObject();
-                            object.put("user_name", "yashesh");
-                            object.put("socket_id", ((JSONObject) args[0]).getString("info"));
-                            data.put("yashesh@gmail.com", object);
+//                            JSONObject object = new JSONObject();
+//                            object.put("user_name", "yashesh");
+//                            object.put("user_name", "fenil");
+//                            object.put("socket_id", ((JSONObject) args[0]).getString("info"));
+//                            data.put("yashesh@gmail.com", object);
+                            data.put("email", "fenil@gmail.com");
+                            data.put("socket_id", ((JSONObject) args[0]).getString("info"));
                             socket.emit("connectedDone", data.toString());
                         }
                     } catch (Exception e) {
