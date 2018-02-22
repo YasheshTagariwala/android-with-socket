@@ -13,7 +13,7 @@ public class SocketService extends JobService {
     @Override
     public boolean onStartJob(JobParameters jobParameters) {
         if (isNetworkAvailable()) {
-//            socketClass.SocketInitialize();
+            socketClass.SocketInitialize();
         }
         return false;
     }

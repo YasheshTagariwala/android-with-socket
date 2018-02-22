@@ -25,7 +25,10 @@ public class SocketClass {
 
     public SocketClass() {
         try {
-            socket = IO.socket(PROTOCOL + SERVER_ADDRESS + ":" + SERVER_PORT + "/");
+            IO.Options options = new IO.Options();
+//            options.forceNew = true;
+            options.reconnection = false;
+            socket = IO.socket(PROTOCOL + SERVER_ADDRESS + ":" + SERVER_PORT + "/", options);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -119,7 +122,7 @@ public class SocketClass {
 //                            object.put("user_name", "fenil");
 //                            object.put("socket_id", ((JSONObject) args[0]).getString("info"));
 //                            data.put("yashesh@gmail.com", object);
-                            data.put("email", "fenil@gmail.com");
+                            data.put("email", "yashesh@gmail.com");
                             data.put("socket_id", ((JSONObject) args[0]).getString("info"));
                             socket.emit("connectedDone", data.toString());
                         }
@@ -135,6 +138,10 @@ public class SocketClass {
 
     public void disconnectSocket() {
         socket.disconnect();
+        socket.off("privateMessageGet", handleIncomingPrivateMessages);
+        socket.off("groupMessage", handleIncomingGroupMessages);
+        socket.off("connected", showConnectedInfo);
+        socket.off("ping", heartBeat);
     }
 
     public static Socket getSocket() {

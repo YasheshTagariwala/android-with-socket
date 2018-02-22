@@ -38,9 +38,9 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-//        checkScheduler();
-        SocketClass socketClass = new SocketClass();
-        socketClass.SocketInitialize();
+        checkScheduler();
+//        SocketClass socketClass = new SocketClass();
+//        socketClass.SocketInitialize();
         startUp();
     }
 
@@ -68,10 +68,10 @@ public class MainActivity extends AppCompatActivity {
             JSONObject data = new JSONObject();
 //            data.put("to", "fenil@gmail.com");
 //            data.put("from", "hemin@gmail.com");
-//            data.put("to", "fenil@gmail.com");
-//            data.put("from", "yashesh@gmail.com");
-            data.put("to", "yashesh@gmail.com");
-            data.put("from", "fenil@gmail.com");
+            data.put("to", "fenil@gmail.com");
+            data.put("from", "yashesh@gmail.com");
+//            data.put("to", "yashesh@gmail.com");
+//            data.put("from", "fenil@gmail.com");
             data.put("message", message);
             SocketClass.getSocket().emit("privateMessageEmit", data.toString());
         } catch (JSONException e) {
@@ -150,7 +150,6 @@ public class MainActivity extends AppCompatActivity {
         }
 
         if (!hasBeenScheduled) {
-            Log.e("yo", "YO");
             JobSchedulerUtils.scheduleJob(getApplicationContext());
         }
     }
