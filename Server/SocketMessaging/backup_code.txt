@@ -23,6 +23,8 @@ socket.on('message',function(data){
 	setTimeout(test,1000);
 
 
+//		users_list.push(JSON.parse(data));
+//		console.log(users_list[user.email]);
 
 
 
@@ -50,6 +52,9 @@ socket.on('message',function(data){
      // sending to individual socketid
      socket.broadcast.to(socketid).emit('message', 'for your eyes only');
 
+     //sending to individual socket(User)
+     io.sockets.connected[socket.id].emit('message','yo');
+
 
 
      The easiest way rather than sending directly to the socket, would be creating a room for the 2 users to use and just send messages freely in there.
@@ -59,3 +64,10 @@ socket.on('message',function(data){
      Otherwise, you're going to need to keep track of each individual clients socket connection, and when you want to chat you'll have to look up that sockets connection and emit specifically to that one using the function I said above. Rooms are probably easier.
 
 
+
+
+//	    console.log(users_list[0]['yashesh@gmail.com']['socket_id']);
+		for(var i=0;i<users_list.length;i++){
+		    io.sockets.connected[users_list[JSON.parse(data).to]].emit('privateMessageGet',{"text":JSON.parse(data).message});
+//            socket.broadcast.to(users_list[i][JSON.parse(data).to].socket_id).emit('privateMessageGet',{"text":JSON.parse(data).message});
+		}

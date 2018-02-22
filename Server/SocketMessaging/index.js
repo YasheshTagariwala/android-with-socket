@@ -21,24 +21,27 @@ io.on('connection',function(socket){
 function allListenersAndEmitters(socket){
 
 	socket.on('privateMessageEmit',function(data){
-		for(var i=0;i<users_list.length;i++){
-		    io.sockets.connected[users_list[i][JSON.parse(data).to].socket_id].emit('privateMessageGet',{"text":JSON.parse(data).message});
-//            socket.broadcast.to(users_list[i][JSON.parse(data).to].socket_id).emit('privateMessageGet',{"text":JSON.parse(data).message});
-		}
+	    if(typeof users_list[JSON.parse(data).to] === 'undefined'){
+	        console.log("User Offline Message Queued");
+	    }else{
+	        io.sockets.connected[users_list[JSON.parse(data).to]].emit('privateMessageGet',{"text":JSON.parse(data).message});
+	    }
+
 	});
 
 	socket.on('connectedDone',function(data){
-		users_list.push(JSON.parse(data));
+	    var user = JSON.parse(data);
+	    users_list[user.email] = user.socket_id;
 	});	
 
     socket.on('groupMessage',function(data){
-//        var sockets = io.sockets.sockets;
         socket.broadcast.emit('groupMessage',data);
     });
 
 
 	socket.on('disconnect',function(){
-		users_list = users_list.filter(item => item.socket_id == socket.id);
+		var index = users_list.indexOf(socket.id);
+        if (index !== -1) users_list.splice(index, 1);
 		console.log("user removed " + socket.id);
 	});
 
