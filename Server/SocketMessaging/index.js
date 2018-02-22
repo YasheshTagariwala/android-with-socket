@@ -1,6 +1,9 @@
 var app = require('express')();
 var server = require('http').Server(app);
-var io = require('socket.io').listen(server);
+var io = require('socket.io')(server,{
+    pingInterval:10000,
+    pintTimeout:5000
+});
 
 
 var users_list = [];
@@ -13,7 +16,7 @@ app.get('/',function(req,res){
 	res.sendFile(__dirname+'/index.html');
 })
 
-io.on('connection',function(socket){
+io.on('connect',function(socket){
 	allListenersAndEmitters(socket);
 })
 
@@ -32,7 +35,8 @@ function allListenersAndEmitters(socket){
 	socket.on('connectedDone',function(data){
 	    var user = JSON.parse(data);
 	    users_list[user.email] = user.socket_id;
-	});	
+	    console.log(users_list);
+	});
 
     socket.on('groupMessage',function(data){
         socket.broadcast.emit('groupMessage',data);
