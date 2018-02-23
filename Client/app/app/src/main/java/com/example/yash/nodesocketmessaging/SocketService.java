@@ -13,7 +13,9 @@ public class SocketService extends JobService {
     @Override
     public boolean onStartJob(JobParameters jobParameters) {
         if (isNetworkAvailable()) {
-            socketClass.SocketInitialize();
+            if (!SocketClass.getSocket().connected()) {
+                socketClass.SocketInitialize(getApplicationContext());
+            }
         }
         return false;
     }

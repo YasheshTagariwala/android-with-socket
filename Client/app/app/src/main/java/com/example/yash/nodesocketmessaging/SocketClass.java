@@ -1,5 +1,6 @@
 package com.example.yash.nodesocketmessaging;
 
+import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
 
@@ -22,6 +23,7 @@ public class SocketClass {
     private static String SERVER_ADDRESS = "192.168.31.32";
     private static int SERVER_PORT = 3000;
     private int info = 1;
+    private Context context;
 
     public SocketClass() {
         try {
@@ -34,13 +36,35 @@ public class SocketClass {
         }
     }
 
-    public void SocketInitialize() {
+    public void SocketInitialize(Context context) {
+        this.context = context;
         socket.connect();
         socket.on("privateMessageGet", handleIncomingPrivateMessages);
         socket.on("groupMessage", handleIncomingGroupMessages);
         socket.on("connected", showConnectedInfo);
         socket.on("ping", heartBeat);
+        socket.on("pushMessage", pushMessageNotification);
     }
+
+    private Emitter.Listener pushMessageNotification = new Emitter.Listener() {
+        @Override
+        public void call(final Object... args) {
+            class PushMessageNotification extends AsyncTask {
+                @Override
+                protected Object doInBackground(Object[] objects) {
+                    JSONObject jsonObject = (JSONObject) args[0];
+                    NotificationUtils notificationUtils = new NotificationUtils();
+                    try {
+                        notificationUtils.showMessageNotification(context, 7, jsonObject.getString("message"), jsonObject.getString("doer"));
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                    return null;
+                }
+            }
+            new PushMessageNotification().execute();
+        }
+    };
 
     private Emitter.Listener handleIncomingGroupMessages = new Emitter.Listener() {
         @Override
@@ -122,7 +146,7 @@ public class SocketClass {
 //                            object.put("user_name", "fenil");
 //                            object.put("socket_id", ((JSONObject) args[0]).getString("info"));
 //                            data.put("yashesh@gmail.com", object);
-                            data.put("email", "yashesh@gmail.com");
+                            data.put("email", "fenil@gmail.com");
                             data.put("socket_id", ((JSONObject) args[0]).getString("info"));
                             socket.emit("connectedDone", data.toString());
                         }
@@ -142,6 +166,7 @@ public class SocketClass {
         socket.off("groupMessage", handleIncomingGroupMessages);
         socket.off("connected", showConnectedInfo);
         socket.off("ping", heartBeat);
+        socket.off("pushMessage", pushMessageNotification);
     }
 
     public static Socket getSocket() {
