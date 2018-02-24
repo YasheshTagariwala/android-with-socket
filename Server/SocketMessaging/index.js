@@ -1,19 +1,16 @@
 var app = require('express')();
 var server = require('http').Server(app);
 var io = require('socket.io')(server,{
-    pingInterval:10000,
-    pintTimeout:5000
+    pingInterval:1000,
+    pintTimeout:2000
 });
 
 
 var users_list = [];
+var offline_private_message = [];
 
 server.listen(3000,function(){
 	console.log("Yep Running");
-})
-
-app.get('/',function(req,res){
-	res.sendFile(__dirname+'/index.html');
 })
 
 io.on('connect',function(socket){
@@ -27,7 +24,8 @@ function allListenersAndEmitters(socket){
 	    var data = JSON.parse(data);
 	    var user = users_list.filter(function(item){return item.email == data.to});
 	    if(user.length == 0){
-	        console.log("User Offline Message Queued");
+	        offline_private_message.push(data);
+	        console.log(offline_private_message);
 	    }else{
 	        io.sockets.connected[user[0].socket_id].emit('privateMessageGet',{"text":data.message});
 	        io.sockets.connected[user[0].socket_id].emit("pushMessage",{"message":data.message,"doer":data.from});
@@ -38,7 +36,16 @@ function allListenersAndEmitters(socket){
 	socket.on('connectedDone',function(data){
 	    var user = JSON.parse(data);
         users_list.push(user);
-	    console.log(users_list);
+        var pending_message = offline_private_message.filter(function(item){ return item.to == user.email});
+        if(pending_message.length != 0){
+            for(var i = 0; i < pending_message.length; i++){
+                io.sockets.connected[user.socket_id].emit('privateMessageGet',{"text":pending_message[i].message});
+                io.sockets.connected[user.socket_id].emit("pushMessage",{"message":pending_message[i].message,"doer":pending_message[i].from});
+            }
+            offline_private_message = offline_private_message.filter(function(item) {return item.to != user.email});
+        }
+        console.log(offline_private_message);
+        console.log(users_list);
 	});
 
     socket.on('groupMessage',function(data){
@@ -60,8 +67,8 @@ function allListenersAndEmitters(socket){
 	console.log("Yo Connected "+socket.id);
 
 	function sendHeartBeat(){
-		setTimeout(sendHeartBeat,20000);
 	    socket.emit('ping', { beat : 1 });
+		setTimeout(sendHeartBeat,20000);
 	}
 
 	setTimeout(sendHeartBeat,20000);

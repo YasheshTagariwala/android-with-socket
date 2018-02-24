@@ -144,3 +144,16 @@ socket.on('message',function(data){
 
 
         var socket = io.connect('http://localhost:3000',{'reconnection': false,'reconnectionDelay': 500,'reconnectionAttempts': 10});
+
+
+var unique = _.map(_.groupBy(users_list,function(doc){
+	        return doc.socket_id;
+	    }),function(grouped){
+	        return grouped[0];
+	    });
+
+
+var _ = require('underscore');
+	    //	    users_list = users_list.filter(function(item){return item.socket_id != socket.id});
+
+	    //        var unique = _.chain(users_list).indexBy("email").values().value();
