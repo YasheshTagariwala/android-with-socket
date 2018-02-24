@@ -17,7 +17,8 @@ public class JobSchedulerUtils {
         JobInfo.Builder builder = new JobInfo.Builder(JOB_ID, serviceComponent);
         builder.setRequiresDeviceIdle(false);
         builder.setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY);
-        builder.setPeriodic(30000);
+//        builder.setPeriodic(300000);//Runs Every Five(5) Minutes
+        builder.setPeriodic(30000);//Runs Every Thirty(30) Seconds
         builder.setPersisted(true);
         JobScheduler jobScheduler = (JobScheduler) context.getSystemService(Context.JOB_SCHEDULER_SERVICE);
         jobScheduler.schedule(builder.build());

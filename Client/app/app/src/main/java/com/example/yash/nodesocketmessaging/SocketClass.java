@@ -5,10 +5,8 @@ import android.os.AsyncTask;
 import android.util.Log;
 
 import com.github.nkzawa.emitter.Emitter;
-import com.github.nkzawa.socketio.client.IO;
 import com.github.nkzawa.socketio.client.Socket;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -19,31 +17,20 @@ import org.json.JSONObject;
 public class SocketClass {
 
     public static Socket socket;
-    private static String PROTOCOL = "http://";
-    private static String SERVER_ADDRESS = "192.168.31.32";
-    private static int SERVER_PORT = 3000;
-    private int info = 1;
     private Context context;
 
     public SocketClass() {
-        try {
-            IO.Options options = new IO.Options();
-//            options.forceNew = true;
-            options.reconnection = false;
-            socket = IO.socket(PROTOCOL + SERVER_ADDRESS + ":" + SERVER_PORT + "/", options);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+
     }
 
-    public void SocketInitialize(Context context) {
+    public void SocketInitialize(Context context, Socket socket) {
         this.context = context;
-        socket.connect();
-        socket.on("privateMessageGet", handleIncomingPrivateMessages);
-        socket.on("groupMessage", handleIncomingGroupMessages);
-        socket.on("connected", showConnectedInfo);
-        socket.on("ping", heartBeat);
-        socket.on("pushMessage", pushMessageNotification);
+        SocketClass.socket = socket;
+        SocketClass.socket.on("privateMessageGet", handleIncomingPrivateMessages);
+        SocketClass.socket.on("groupMessage", handleIncomingGroupMessages);
+        SocketClass.socket.on("connected", showConnectedInfo);
+        SocketClass.socket.on("ping", heartBeat);
+        SocketClass.socket.on("pushMessage", pushMessageNotification);
     }
 
     private Emitter.Listener pushMessageNotification = new Emitter.Listener() {
@@ -138,18 +125,10 @@ public class SocketClass {
                 @Override
                 protected Object doInBackground(Object[] objects) {
                     try {
-                        if (info == 1) {
-                            info = 2;
-                            JSONObject data = new JSONObject();
-//                            JSONObject object = new JSONObject();
-//                            object.put("user_name", "yashesh");
-//                            object.put("user_name", "fenil");
-//                            object.put("socket_id", ((JSONObject) args[0]).getString("info"));
-//                            data.put("yashesh@gmail.com", object);
-                            data.put("email", "fenil@gmail.com");
-                            data.put("socket_id", ((JSONObject) args[0]).getString("info"));
-                            socket.emit("connectedDone", data.toString());
-                        }
+                        JSONObject data = new JSONObject();
+                        data.put("email", "yashesh@gmail.com");
+                        data.put("socket_id", ((JSONObject) args[0]).getString("info"));
+                        socket.emit("connectedDone", data.toString());
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -162,11 +141,8 @@ public class SocketClass {
 
     public void disconnectSocket() {
         socket.disconnect();
-        socket.off("privateMessageGet", handleIncomingPrivateMessages);
-        socket.off("groupMessage", handleIncomingGroupMessages);
-        socket.off("connected", showConnectedInfo);
-        socket.off("ping", heartBeat);
-        socket.off("pushMessage", pushMessageNotification);
+        socket.off();
+        socket = null;
     }
 
     public static Socket getSocket() {
