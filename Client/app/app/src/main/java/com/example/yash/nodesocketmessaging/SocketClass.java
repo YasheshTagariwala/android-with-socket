@@ -126,7 +126,7 @@ public class SocketClass {
                 protected Object doInBackground(Object[] objects) {
                     try {
                         JSONObject data = new JSONObject();
-                        data.put("email", "yashesh@gmail.com");
+                        data.put("email", "fenil@gmail.com");
                         data.put("socket_id", ((JSONObject) args[0]).getString("info"));
                         socket.emit("connectedDone", data.toString());
                     } catch (Exception e) {

@@ -43,7 +43,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void startUp() {
-        mainActivity = (MainActivity) this;
+        mainActivity = this;
         mMessagesView = findViewById(R.id.message_recycle);
         mMessagesView.setLayoutManager(new LinearLayoutManager(this));
         mAdapter = new MessageAdapter(mMessages);
@@ -66,10 +66,10 @@ public class MainActivity extends AppCompatActivity {
             JSONObject data = new JSONObject();
 //            data.put("to", "fenil@gmail.com");
 //            data.put("from", "hemin@gmail.com");
-            data.put("to", "fenil@gmail.com");
-            data.put("from", "yashesh@gmail.com");
-//            data.put("to", "yashesh@gmail.com");
-//            data.put("from", "fenil@gmail.com");
+//            data.put("to", "fenil@gmail.com");
+//            data.put("from", "yashesh@gmail.com");
+            data.put("to", "yashesh@gmail.com");
+            data.put("from", "fenil@gmail.com");
             data.put("message", message);
             SocketClass.getSocket().emit("privateMessageEmit", data.toString());
         } catch (JSONException e) {
