@@ -157,3 +157,246 @@ var _ = require('underscore');
 	    //	    users_list = users_list.filter(function(item){return item.socket_id != socket.id});
 
 	    //        var unique = _.chain(users_list).indexBy("email").values().value();
+
+
+
+	    if(fs.existsSync(filePath)){
+                fs.readFile(filePath,function(error,data){
+                    if(error) throw error;
+                    offline_private_message = JSON.parse(data);
+                });
+            }
+
+
+            fs.writeFile(filePath,JSON.stringify(offline_private_message),function(error){
+                            if(error) throw error;
+                        });
+
+
+
+
+
+
+25-02-2018 (Database)
+
+
+var app = require('express')();
+var server = require('http').Server(app);
+var io = require('socket.io')(server,{
+    pingInterval:1000,
+    pintTimeout:2000
+});
+
+var sqlite3 = require('sqlite3').verbose();
+var db = null;
+var filePath = __dirname+'/privateMessageQueue.db';
+
+
+var users_list = [];
+var offline_private_message = [];
+
+server.listen(3000,function(){
+	console.log("Yep Running");
+});
+
+io.on('connect',function(socket){
+    createDatabaseIfNotExists();
+	allListenersAndEmitters(socket);
+});
+
+function allListenersAndEmitters(socket){
+
+	socket.on('privateMessageEmit',function(data){
+	    var data = JSON.parse(data);
+	    var user = users_list.filter(function(item){return item.email == data.to});
+	    if(user.length == 0){
+	        insertIntoPrivateMessageQueue(data);
+	    }else{
+	        io.sockets.connected[user[0].socket_id].emit('privateMessageGet',{"text":data.message});
+	        io.sockets.connected[user[0].socket_id].emit("pushMessage",{"message":data.message,"doer":data.from});
+	    }
+
+	});
+
+	socket.on('connectedDone',function(data){
+	    var user = JSON.parse(data);
+        users_list.push(user);
+        getAllPendingMessages(user.email);
+        if(offline_private_message.length != 0){
+            for(var i = 0; i < offline_private_message.length; i++){
+                io.sockets.connected[user.socket_id].emit('privateMessageGet',{"text":offline_private_message[i].message});
+                io.sockets.connected[user.socket_id].emit("pushMessage",{"message":offline_private_message[i].message,"doer":offline_private_message[i].from});
+            }
+            offline_private_message = [];
+            deleteMessageFromQueue(user.email);
+        }
+        console.log(users_list);
+	});
+
+    socket.on('groupMessage',function(data){
+        socket.broadcast.emit('groupMessage',data);
+    });
+
+
+	socket.on('disconnect',function(){
+        users_list = users_list.filter(function(item){return item.socket_id != socket.id});
+		console.log("user removed " + socket.id);
+	});
+
+	socket.emit('connected',{"info":socket.id});
+	console.log("User Connected "+socket.id);
+
+	function sendHeartBeat(){
+	    socket.emit('ping', { beat : 1 });
+		setTimeout(sendHeartBeat,30000);
+	}
+
+	setTimeout(sendHeartBeat,30000);
+}
+
+function createDatabaseIfNotExists(){
+    db = new sqlite3.Database(filePath,sqlite3.OPEN_CREATE | sqlite3.OPEN_READWRITE,(err)=>{
+        if(err) console.log(err.stack);
+    });
+    db.run('CREATE TABLE IF NOT EXISTS pendingMessage(`to` text,`from` text,`message` text)');
+    closeDatabaseConnection();
+}
+
+function openDatabaseConnection(){
+    db = new sqlite3.Database(filePath,sqlite3.OPEN_READWRITE,(err)=>{
+        if(err) console.log(err.stack);
+    });
+}
+
+function getAllPendingMessages(userEmail){
+    openDatabaseConnection();
+    var query = 'SELECT * FROM pendingMessage WHERE `to` = ?';
+    db.all(query , [userEmail] ,(err, row) => {
+        if(err) console.log(err.stack);
+        var data = {};
+        data['to'] = `${row.to}`;
+        data['from'] = `${row.from}`;
+        data['message'] = `${row.message}`;
+        offline_private_message.push(data);
+    });
+    console.log(offline_private_message);
+    closeDatabaseConnection();
+}
+
+function closeDatabaseConnection(){
+    db.close((err)=>{
+        if(err) console.log(err.stack);
+    });
+}
+
+function insertIntoPrivateMessageQueue(data){
+    openDatabaseConnection();
+    var query = 'INSERT INTO pendingMessage(`to`,`from`,`message`) VALUES(?,?,?)';
+    db.run(query,[data.to,data.from,data.message] , (err) => {
+        if(err) console.log(err.stack);
+    });
+    closeDatabaseConnection();
+}
+
+function deleteMessageFromQueue(userEmail){
+    openDatabaseConnection();
+    var query = 'DELETE FROM pendingMessage where `to` = ?';
+    db.run(query, [userEmail] ,(err) =>{
+        if(err) console.log(err.stack);
+    });
+    closeDatabaseConnection();
+}
+
+
+
+25-02-2018 (Json File)
+
+
+var app = require('express')();
+var server = require('http').Server(app);
+var io = require('socket.io')(server,{
+    pingInterval:1000,
+    pintTimeout:2000
+});
+
+var fs = require('fs');
+var filePath = __dirname + '/privateMessageQueue.json';
+
+
+var users_list = [];
+var offline_private_message = [];
+
+server.listen(3000,function(){
+	console.log("Yep Running");
+})
+
+io.on('connect',function(socket){
+    if(fs.existsSync(filePath)){
+        fs.readFile(filePath,function(error,data){
+            if(error) throw error;
+            offline_private_message = JSON.parse(data);
+            console.log(offline_private_message);
+        });
+    }
+	allListenersAndEmitters(socket);
+})
+
+
+function allListenersAndEmitters(socket){
+
+	socket.on('privateMessageEmit',function(data){
+	    var data = JSON.parse(data);
+	    var user = users_list.filter(function(item){return item.email == data.to});
+	    if(user.length == 0){
+	        offline_private_message.push(data);
+	        fs.writeFile(filePath,JSON.stringify(offline_private_message),function(error){
+                if(error) throw error;
+                console.log('Saved');
+            });
+	    }else{
+	        io.sockets.connected[user[0].socket_id].emit('privateMessageGet',{"text":data.message});
+	        io.sockets.connected[user[0].socket_id].emit("pushMessage",{"message":data.message,"doer":data.from});
+	    }
+
+	});
+
+	socket.on('connectedDone',function(data){
+	    var user = JSON.parse(data);
+        users_list.push(user);
+        var pending_message = offline_private_message.filter(function(item){ return item.to == user.email});
+        if(pending_message.length != 0){
+            for(var i = 0; i < pending_message.length; i++){
+                io.sockets.connected[user.socket_id].emit('privateMessageGet',{"text":pending_message[i].message});
+                io.sockets.connected[user.socket_id].emit("pushMessage",{"message":pending_message[i].message,"doer":pending_message[i].from});
+            }
+            offline_private_message = offline_private_message.filter(function(item) {return item.to != user.email});
+            fs.writeFile(filePath,JSON.stringify(offline_private_message),function(error){
+                if(error) throw error;
+                console.log('Saved');
+            });
+        }
+//        console.log(offline_private_message);
+        console.log(users_list);
+	});
+
+    socket.on('groupMessage',function(data){
+        socket.broadcast.emit('groupMessage',data);
+    });
+
+
+	socket.on('disconnect',function(){
+        users_list = users_list.filter(function(item){return item.socket_id != socket.id});
+		console.log("user removed " + socket.id);
+	});
+
+	socket.emit('connected',{"info":socket.id});
+	console.log("User Connected "+socket.id);
+
+	function sendHeartBeat(){
+	    socket.emit('ping', { beat : 1 });
+		setTimeout(sendHeartBeat,20000);
+	}
+
+	setTimeout(sendHeartBeat,20000);
+
+}

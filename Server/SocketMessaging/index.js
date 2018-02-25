@@ -5,6 +5,9 @@ var io = require('socket.io')(server,{
     pintTimeout:2000
 });
 
+var fs = require('fs');
+var filePath = __dirname + '/privateMessageQueue.json';
+
 
 var users_list = [];
 var offline_private_message = [];
@@ -14,6 +17,12 @@ server.listen(3000,function(){
 })
 
 io.on('connect',function(socket){
+    if(fs.existsSync(filePath)){
+        fs.readFile(filePath,function(error,data){
+            if(error) throw error;
+            offline_private_message = JSON.parse(data);
+        });
+    }
 	allListenersAndEmitters(socket);
 })
 
@@ -25,7 +34,9 @@ function allListenersAndEmitters(socket){
 	    var user = users_list.filter(function(item){return item.email == data.to});
 	    if(user.length == 0){
 	        offline_private_message.push(data);
-	        console.log(offline_private_message);
+	        fs.writeFile(filePath,JSON.stringify(offline_private_message),function(error){
+                if(error) throw error;
+            });
 	    }else{
 	        io.sockets.connected[user[0].socket_id].emit('privateMessageGet',{"text":data.message});
 	        io.sockets.connected[user[0].socket_id].emit("pushMessage",{"message":data.message,"doer":data.from});
@@ -37,14 +48,20 @@ function allListenersAndEmitters(socket){
 	    var user = JSON.parse(data);
         users_list.push(user);
         var pending_message = offline_private_message.filter(function(item){ return item.to == user.email});
+        var from = "";
+        var message = "";
         if(pending_message.length != 0){
             for(var i = 0; i < pending_message.length; i++){
                 io.sockets.connected[user.socket_id].emit('privateMessageGet',{"text":pending_message[i].message});
-                io.sockets.connected[user.socket_id].emit("pushMessage",{"message":pending_message[i].message,"doer":pending_message[i].from});
+                from = pending_message[i].from;
+                message = pending_message[i].message;
             }
+            io.sockets.connected[user.socket_id].emit("pushMessage",{"message":message,"doer":from});
             offline_private_message = offline_private_message.filter(function(item) {return item.to != user.email});
+            fs.writeFile(filePath,JSON.stringify(offline_private_message),function(error){
+                if(error) throw error;
+            });
         }
-        console.log(offline_private_message);
         console.log(users_list);
 	});
 
@@ -58,13 +75,8 @@ function allListenersAndEmitters(socket){
 		console.log("user removed " + socket.id);
 	});
 
-	socket.on('heartbeat',function(data){
-		console.log("beating");
-	});
-
-
 	socket.emit('connected',{"info":socket.id});
-	console.log("Yo Connected "+socket.id);
+	console.log("User Connected "+socket.id);
 
 	function sendHeartBeat(){
 	    socket.emit('ping', { beat : 1 });
@@ -72,5 +84,4 @@ function allListenersAndEmitters(socket){
 	}
 
 	setTimeout(sendHeartBeat,20000);
-
 }
