@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -66,11 +67,16 @@ public class MainActivity extends AppCompatActivity {
             JSONObject data = new JSONObject();
 //            data.put("to", "fenil@gmail.com");
 //            data.put("from", "hemin@gmail.com");
-//            data.put("to", "fenil@gmail.com");
-//            data.put("from", "yashesh@gmail.com");
-            data.put("to", "yashesh@gmail.com");
-            data.put("from", "fenil@gmail.com");
+            data.put("to", "fenil@gmail.com");
+            data.put("from", "yashesh@gmail.com");
+//            data.put("to", "yashesh@gmail.com");
+//            data.put("from", "fenil@gmail.com");
             data.put("message", message);
+            if (SocketClass.getSocket() == null) {
+                SocketClass.connectSocket(getApplicationContext());
+            } else if (!SocketClass.getSocket().connected()) {
+                SocketClass.connectSocket(getApplicationContext());
+            }
             SocketClass.getSocket().emit("privateMessageEmit", data.toString());
         } catch (JSONException e) {
             e.printStackTrace();
@@ -83,7 +89,12 @@ public class MainActivity extends AppCompatActivity {
             sendData.put("image", encodeImage(path));
             Bitmap bmp = decodeImage(sendData.getString("image"));
             addImage(bmp);
-            SocketClass.getSocket().emit("privateMessage", sendData);
+            if (SocketClass.getSocket() == null) {
+                SocketClass.connectSocket(getApplicationContext());
+            } else if (!SocketClass.getSocket().connected()) {
+                SocketClass.connectSocket(getApplicationContext());
+            }
+            SocketClass.getSocket().emit("privateMessageEmit", sendData);
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -138,16 +149,21 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void checkScheduler() {
-        JobScheduler jobScheduler = (JobScheduler) getSystemService(Context.JOB_SCHEDULER_SERVICE);
-        boolean hasBeenScheduled = false;
-        for (JobInfo jobInfo : jobScheduler.getAllPendingJobs()) {
-            if (jobInfo.getId() == JobSchedulerUtils.JOB_ID) {
-                hasBeenScheduled = true;
-                break;
-            }
-        }
-
-        if (!hasBeenScheduled) {
+//        JobScheduler jobScheduler = (JobScheduler) getSystemService(Context.JOB_SCHEDULER_SERVICE);
+//        boolean hasBeenScheduled = false;
+//        for (JobInfo jobInfo : jobScheduler.getAllPendingJobs()) {
+//            if (jobInfo.getId() == JobSchedulerUtils.JOB_ID) {
+//                hasBeenScheduled = true;
+//                break;
+//            }
+//        }
+//
+//        if (!hasBeenScheduled) {
+//            JobSchedulerUtils.scheduleJob(getApplicationContext());
+//        }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            JobSchedulerUtils.scheduleJobForN(getApplicationContext());
+        } else {
             JobSchedulerUtils.scheduleJob(getApplicationContext());
         }
     }

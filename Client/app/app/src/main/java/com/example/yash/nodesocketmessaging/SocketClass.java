@@ -5,6 +5,7 @@ import android.os.AsyncTask;
 import android.util.Log;
 
 import com.github.nkzawa.emitter.Emitter;
+import com.github.nkzawa.socketio.client.IO;
 import com.github.nkzawa.socketio.client.Socket;
 
 import org.json.JSONException;
@@ -20,7 +21,6 @@ public class SocketClass {
     private Context context;
 
     public SocketClass() {
-
     }
 
     public void SocketInitialize(Context context, Socket socket) {
@@ -42,7 +42,7 @@ public class SocketClass {
                     JSONObject jsonObject = (JSONObject) args[0];
                     NotificationUtils notificationUtils = new NotificationUtils();
                     try {
-                        notificationUtils.showMessageNotification(context, 7, jsonObject.getString("message"), jsonObject.getString("doer"));
+                        notificationUtils.showMessageNotification(context, Integer.parseInt(jsonObject.getString("type")), jsonObject.getString("message"), jsonObject.getString("doer"));
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
@@ -126,7 +126,8 @@ public class SocketClass {
                 protected Object doInBackground(Object[] objects) {
                     try {
                         JSONObject data = new JSONObject();
-                        data.put("email", "fenil@gmail.com");
+//                        data.put("email", "fenil@gmail.com");
+                        data.put("email", "yashesh@gmail.com");
                         data.put("socket_id", ((JSONObject) args[0]).getString("info"));
                         socket.emit("connectedDone", data.toString());
                     } catch (Exception e) {
@@ -140,9 +141,33 @@ public class SocketClass {
     };
 
     public void disconnectSocket() {
-        socket.disconnect();
-        socket.off();
-        socket = null;
+        SocketClass.socket.disconnect();
+        SocketClass.socket.off();
+        SocketClass.socket = null;
+    }
+
+    public static void connectSocket(Context context) {
+        Socket socket;
+        String PROTOCOL = "http://";
+        String SERVER_ADDRESS = "192.168.31.32";
+        int SERVER_PORT = 3000;
+        try {
+            IO.Options options = new IO.Options();
+            options.reconnection = false;
+            options.reconnectionAttempts = 0;
+            socket = IO.socket(PROTOCOL + SERVER_ADDRESS + ":" + SERVER_PORT + "/", options);
+            socket.connect();
+            final SocketClass socketClass = new SocketClass();
+            socketClass.SocketInitialize(context, socket);
+            socket.on(Socket.EVENT_CONNECT_ERROR, new Emitter.Listener() {
+                @Override
+                public void call(Object... args) {
+                    socketClass.disconnectSocket();
+                }
+            });
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public static Socket getSocket() {

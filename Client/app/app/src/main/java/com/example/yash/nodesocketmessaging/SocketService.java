@@ -31,13 +31,14 @@ public class SocketService extends JobService {
             }
             if (!socket.connected()) {
                 socket.connect();
+                socketClass.SocketInitialize(getApplicationContext(), socket);
                 socket.on(Socket.EVENT_CONNECT_ERROR, new Emitter.Listener() {
                     @Override
                     public void call(Object... args) {
+                        socket.disconnect();
                         onStopJob(jobParameters);
                     }
                 });
-                socketClass.SocketInitialize(getApplicationContext(), socket);
             }
         }
         jobFinished(jobParameters, false);
@@ -46,7 +47,9 @@ public class SocketService extends JobService {
 
     @Override
     public boolean onStopJob(JobParameters jobParameters) {
-        socketClass.disconnectSocket();
+        if (SocketClass.getSocket() != null) {
+            socketClass.disconnectSocket();
+        }
         return false;
     }
 
