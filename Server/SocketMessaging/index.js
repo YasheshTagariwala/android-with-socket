@@ -39,7 +39,7 @@ function allListenersAndEmitters(socket){
             });
 	    }else{
 	        io.sockets.connected[user[0].socket_id].emit('privateMessageGet',{"text":data.message});
-	        io.sockets.connected[user[0].socket_id].emit("pushMessage",{"message":data.message,"doer":data.from});
+	        customPushNotification(user[0].socket_id,data.message,data.from,7);
 	    }
 
 	});
@@ -56,7 +56,7 @@ function allListenersAndEmitters(socket){
                 from = pending_message[i].from;
                 message = pending_message[i].message;
             }
-            io.sockets.connected[user.socket_id].emit("pushMessage",{"message":message,"doer":from});
+            customPushNotification(user.socket_id,message,from,7);
             offline_private_message = offline_private_message.filter(function(item) {return item.to != user.email});
             fs.writeFile(filePath,JSON.stringify(offline_private_message),function(error){
                 if(error) throw error;
@@ -64,6 +64,13 @@ function allListenersAndEmitters(socket){
         }
         console.log(users_list);
 	});
+
+	socket.on('otherActivities',function(data){
+        var user = users_list.filter(function(item){return item.email == data.to});
+        if(user.length != 0){
+            customPushNotification(user[0].socket_id,data.message,data.from,data.type);
+        }
+	})
 
     socket.on('groupMessage',function(data){
         socket.broadcast.emit('groupMessage',data);
@@ -84,4 +91,8 @@ function allListenersAndEmitters(socket){
 	}
 
 	setTimeout(sendHeartBeat,20000);
+}
+
+function customPushNotification(socketId,message,from,type){
+    io.sockets.connected[socketId].emit("pushMessage",{"message":message,"doer":from,"type":type});
 }
