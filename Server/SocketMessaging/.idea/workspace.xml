@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="8549ceee-7772-48a7-a80f-30a1e5def347" name="Default" comment="">
+    <list default="true" id="8549ceee-7772-48a7-a80f-30a1e5def347" name="Default" comment="Added CustomPushNotification For All Time Of Notifications">
       <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../Client/app/.idea/dbnavigator.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../Client/app/app/src/main/java/com/example/yash/nodesocketmessaging/MainActivity.java" afterPath="$PROJECT_DIR$/../../Client/app/app/src/main/java/com/example/yash/nodesocketmessaging/MainActivity.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../Client/app/app/src/main/java/com/example/yash/nodesocketmessaging/SocketClass.java" afterPath="$PROJECT_DIR$/../../Client/app/app/src/main/java/com/example/yash/nodesocketmessaging/SocketClass.java" />
@@ -21,14 +21,21 @@
       <file leaf-file-name="index.js" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/index.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1207">
-              <caret line="71" column="9" lean-forward="true" selection-start-line="71" selection-start-column="9" selection-end-line="71" selection-end-column="9" />
+            <state relative-caret-position="918">
+              <caret line="54" column="25" lean-forward="true" selection-start-line="54" selection-start-column="25" selection-end-line="54" selection-end-column="25" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
     </leaf>
+  </component>
+  <component name="FindInProjectRecents">
+    <findStrings>
+      <find>onConnect</find>
+      <find>privateMessage</find>
+      <find>onDisconnect</find>
+    </findStrings>
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/../.." />
@@ -181,7 +188,7 @@
       <option name="ACTIVITY_CLASS" value="" />
       <method>
         <option name="Android.Gradle.BeforeRunTask" enabled="true" />
-        <option name="com.android.instantApps.provision.BeforeRunTask" enabled="true" clearCache="false" clearProvisionedDevices="false" myTimestamp="1519666555772" />
+        <option name="com.android.instantApps.provision.BeforeRunTask" enabled="true" clearCache="false" clearProvisionedDevices="false" myTimestamp="1519668321490" />
       </method>
     </configuration>
     <configuration default="true" type="AndroidTestRunConfigurationType" factoryName="Android Instrumented Tests">
@@ -229,7 +236,7 @@
       </Profilers>
       <method>
         <option name="Android.Gradle.BeforeRunTask" enabled="true" />
-        <option name="com.android.instantApps.provision.BeforeRunTask" enabled="true" clearCache="false" clearProvisionedDevices="false" myTimestamp="1519666555772" />
+        <option name="com.android.instantApps.provision.BeforeRunTask" enabled="true" clearCache="false" clearProvisionedDevices="false" myTimestamp="1519668321490" />
       </method>
     </configuration>
     <configuration default="true" type="Application" factoryName="Application">
@@ -455,7 +462,14 @@
       <option name="project" value="LOCAL" />
       <updated>1519576324787</updated>
     </task>
-    <option name="localTasksCounter" value="9" />
+    <task id="LOCAL-00009" summary="Added CustomPushNotification For All Time Of Notifications">
+      <created>1519666617771</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1519666617771</updated>
+    </task>
+    <option name="localTasksCounter" value="10" />
     <servers />
   </component>
   <component name="ToolWindowManager">
@@ -535,7 +549,8 @@
     <MESSAGE value="Solved The Message Queue Problem And Added PushNotification Emitter" />
     <MESSAGE value="Added Offline Message Queue And Send Them To User Once Connected&#10;With Push Notifications" />
     <MESSAGE value="Now Offline Messages Are Stored In JSON File And Sent To User Once Connected" />
-    <option name="LAST_COMMIT_MESSAGE" value="Now Offline Messages Are Stored In JSON File And Sent To User Once Connected" />
+    <MESSAGE value="Added CustomPushNotification For All Time Of Notifications" />
+    <option name="LAST_COMMIT_MESSAGE" value="Added CustomPushNotification For All Time Of Notifications" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager />
@@ -562,6 +577,7 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
         </state>
       </provider>
     </entry>
@@ -673,6 +689,7 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
         </state>
       </provider>
     </entry>
@@ -686,8 +703,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/index.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1207">
-          <caret line="71" column="9" lean-forward="true" selection-start-line="71" selection-start-column="9" selection-end-line="71" selection-end-column="9" />
+        <state relative-caret-position="918">
+          <caret line="54" column="25" lean-forward="true" selection-start-line="54" selection-start-column="25" selection-end-line="54" selection-end-column="25" />
           <folding />
         </state>
       </provider>
