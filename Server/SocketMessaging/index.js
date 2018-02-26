@@ -136,7 +136,7 @@ function otherActivities(data){
     }
 }
 
-//A Custom Push Notification Function Which Can Be Used For Every Other Service
+//A Custom Push Notification Function Which Can Be Used For Every Other Service To Push Notifications
 function customPushNotification(socketId,message,from,type){
     io.sockets.connected[socketId].emit("pushMessage",{"message":message,"doer":from,"type":type});
 }
