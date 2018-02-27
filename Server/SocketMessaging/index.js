@@ -30,7 +30,7 @@ server.listen(3000,function(){
 //Event Fired When A Client Is Connected
 //Used To Initialize All The Other Socket Event
 io.on('connect',function(socket){
-    onConnect();
+    onConnect(socket);
 	allListeners(socket);
 })
 
@@ -59,19 +59,13 @@ function allListeners(socket){
 
     //Disconnect Message Event
 	socket.on('disconnect',function(){
-        onDisconnect();
+        onDisconnect(socket);
 	});
 
 }
 
-//A HeartBeat Function To Stay Connected With User
-function sendHeartBeat(){
-    socket.emit('ping', { beat : 1 });
-    setTimeout(sendHeartBeat,20000);
-}
-
 //A Disconnect Function To Remove User From Connected Client List Array(user_list)
-function onDisconnect(){
+function onDisconnect(socket){
     users_list = users_list.filter(function(item){return item.socket_id != socket.id});
     console.log("user removed " + socket.id);
 }
@@ -82,9 +76,7 @@ function privateMessage(data){
     var user = users_list.filter(function(item){return item.email == data.to});
     if(user.length == 0){
         offline_private_message.push(data);
-        fs.writeFile(filePath,JSON.stringify(offline_private_message),function(error){
-            if(error) throw error;
-        });
+        writeMessageToFile(offline_private_message);
     }else{
         io.sockets.connected[user[0].socket_id].emit('privateMessageGet',{"text":data.message});
         customPushNotification(user[0].socket_id,data.message,data.from,7);
@@ -93,7 +85,7 @@ function privateMessage(data){
 
 //Checks For Any Offline Messages File Exists / Create It
 //And Prints A Log That User Is Connected And Emits Connected Event To Get User Information
-function onConnect(){
+function onConnect(socket){
     if(fs.existsSync(filePath)){
         fs.readFile(filePath,function(error,data){
             if(error) throw error;
@@ -103,6 +95,12 @@ function onConnect(){
     socket.emit('connected',{"info":socket.id});
     console.log("User Connected "+socket.id);
     setTimeout(sendHeartBeat,20000);
+
+    //A HeartBeat Function To Stay Connected With User
+    function sendHeartBeat(){
+        socket.emit('ping', { beat : 1 });
+        setTimeout(sendHeartBeat,20000);
+    }
 }
 
 //Adds User To Connected Client Array(user_list)
@@ -121,9 +119,7 @@ function connectionDone(data){
         }
         customPushNotification(user.socket_id,message,from,7);
         offline_private_message = offline_private_message.filter(function(item) {return item.to != user.email});
-        fs.writeFile(filePath,JSON.stringify(offline_private_message),function(error){
-            if(error) throw error;
-        });
+        writeMessageToFile(offline_private_message);
     }
     console.log(users_list);
 }
@@ -139,4 +135,11 @@ function otherActivities(data){
 //A Custom Push Notification Function Which Can Be Used For Every Other Service To Push Notifications
 function customPushNotification(socketId,message,from,type){
     io.sockets.connected[socketId].emit("pushMessage",{"message":message,"doer":from,"type":type});
+}
+
+//Writes Offline Messages To File
+function writeMessageToFile(data){
+    fs.writeFile(filePath,JSON.stringify(data),function(error){
+        if(error) throw error;
+    });
 }
