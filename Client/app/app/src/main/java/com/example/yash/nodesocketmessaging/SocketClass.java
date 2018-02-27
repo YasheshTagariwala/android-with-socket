@@ -11,6 +11,8 @@ import com.github.nkzawa.socketio.client.Socket;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.net.URISyntaxException;
+
 /**
  * Created by Yash on 17-02-2018.
  */
@@ -148,14 +150,11 @@ public class SocketClass {
 
     public static void connectSocket(Context context) {
         Socket socket;
-        String PROTOCOL = "http://";
-        String SERVER_ADDRESS = "192.168.31.32";
-        int SERVER_PORT = 3000;
         try {
             IO.Options options = new IO.Options();
             options.reconnection = false;
             options.reconnectionAttempts = 0;
-            socket = IO.socket(PROTOCOL + SERVER_ADDRESS + ":" + SERVER_PORT + "/", options);
+            socket = IO.socket(SocketUtils.PROTOCOL + SocketUtils.SERVER_ADDRESS + ":" + SocketUtils.SERVER_PORT + "/", options);
             socket.connect();
             final SocketClass socketClass = new SocketClass();
             socketClass.SocketInitialize(context, socket);
