@@ -23,13 +23,13 @@ var users_list = [];
 var offline_private_message = [];
 
 //Start The Server To On Specific Port eg:- (3000)
-server.listen(3000,function(){
+server.listen(3000,() => {
 	console.log("Yep Running");
 })
 
 //Event Fired When A Client Is Connected
 //Used To Initialize All The Other Socket Event
-io.on('connect',function(socket){
+io.on('connect',(socket) => {
     onConnect(socket);
 	allListeners(socket);
 })
@@ -38,27 +38,27 @@ io.on('connect',function(socket){
 function allListeners(socket){
 
     //Private Message Event
-	socket.on('privateMessageEmit',function(data){
+	socket.on('privateMessageEmit',(data) => {
 	    privateMessage(data);
 	});
 
     //Connection Done Event
-	socket.on('connectedDone',function(data){
+	socket.on('connectedDone',(data) => {
 	    connectionDone(data);
 	});
 
     //Other Activities Event
-	socket.on('otherActivities',function(data){
+	socket.on('otherActivities',(data) => {
         otherActivities(data);
 	})
 
     //Group Message Event
-    socket.on('groupMessage',function(data){
+    socket.on('groupMessage',(data) => {
 //        socket.broadcast.emit('groupMessage',data);
     });
 
     //Disconnect Message Event
-	socket.on('disconnect',function(){
+	socket.on('disconnect',() => {
         onDisconnect(socket);
 	});
 
@@ -66,14 +66,14 @@ function allListeners(socket){
 
 //A Disconnect Function To Remove User From Connected Client List Array(user_list)
 function onDisconnect(socket){
-    users_list = users_list.filter(function(item){return item.socket_id != socket.id});
+    users_list = users_list.filter((item) => {return item.socket_id != socket.id});
     console.log("user removed " + socket.id);
 }
 
 //Sends A Private Message To Specific Client With Push Notification
 function privateMessage(data){
     var data = JSON.parse(data);
-    var user = users_list.filter(function(item){return item.email == data.to});
+    var user = users_list.filter((item) => {return item.email == data.to});
     if(user.length == 0){
         offline_private_message.push(data);
         writeMessageToFile(offline_private_message);
@@ -87,7 +87,7 @@ function privateMessage(data){
 //And Prints A Log That User Is Connected And Emits Connected Event To Get User Information
 function onConnect(socket){
     if(fs.existsSync(filePath)){
-        fs.readFile(filePath,function(error,data){
+        fs.readFile(filePath,(error,data) => {
             if(error) throw error;
             offline_private_message = JSON.parse(data);
         });
@@ -108,7 +108,7 @@ function onConnect(socket){
 function connectionDone(data){
     var user = JSON.parse(data);
     users_list.push(user);
-    var pending_message = offline_private_message.filter(function(item){ return item.to == user.email});
+    var pending_message = offline_private_message.filter((item) => { return item.to == user.email});
     var from = "";
     var message = "";
     if(pending_message.length != 0){
@@ -118,7 +118,7 @@ function connectionDone(data){
             message = pending_message[i].message;
         }
         customPushNotification(user.socket_id,message,from,7);
-        offline_private_message = offline_private_message.filter(function(item) {return item.to != user.email});
+        offline_private_message = offline_private_message.filter((item) => {return item.to != user.email});
         writeMessageToFile(offline_private_message);
     }
     console.log(users_list);
@@ -126,7 +126,7 @@ function connectionDone(data){
 
 //Fired When Sending Push Notification For Any Other Activity(Liked,Commented,Etc..)
 function otherActivities(data){
-    var user = users_list.filter(function(item){return item.email == data.to});
+    var user = users_list.filter((item) => {return item.email == data.to});
     if(user.length != 0){
         customPushNotification(user[0].socket_id,data.message,data.from,data.type);
     }
@@ -139,7 +139,7 @@ function customPushNotification(socketId,message,from,type){
 
 //Writes Offline Messages To File
 function writeMessageToFile(data){
-    fs.writeFile(filePath,JSON.stringify(data),function(error){
+    fs.writeFile(filePath,JSON.stringify(data),(error) => {
         if(error) throw error;
     });
 }
