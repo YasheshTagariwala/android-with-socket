@@ -5,10 +5,7 @@ var app = require('express')();
 var server = require('http').Server(app);
 
 //An Socket Object To For All Other Purpose
-var io = require('socket.io')(server,{
-    pingInterval:1000,
-    pintTimeout:2000
-});
+var io = require('socket.io')(server);
 
 //An FileSystem Object For Read Write Operation
 var fs = require('fs');
@@ -27,9 +24,10 @@ server.listen(3000,() => {
 	console.log("Yep Running");
 })
 
+const device = io.of('/socket');
 //Event Fired When A Client Is Connected
 //Used To Initialize All The Other Socket Event
-io.on('connect',(socket) => {
+device.on('connect',(socket) => {
     onConnect(socket);
 	allListeners(socket);
 })
@@ -78,7 +76,7 @@ function privateMessage(data){
         offline_private_message.push(data);
         writeMessageToFile(offline_private_message);
     }else{
-        io.sockets.connected[user[0].socket_id].emit('privateMessageGet',{"text":data.message});
+        io.of('/socket').connected[user[0].socket_id].emit('privateMessageGet',{"text":data.message});
         customPushNotification(user[0].socket_id,data.message,data.from,7);
     }
 }
@@ -113,7 +111,7 @@ function connectionDone(data){
     var message = "";
     if(pending_message.length != 0){
         for(var i = 0; i < pending_message.length; i++){
-            io.sockets.connected[user.socket_id].emit('privateMessageGet',{"text":pending_message[i].message});
+            io.of('/socket').connected[user.socket_id].emit('privateMessageGet',{"text":pending_message[i].message});
             from = pending_message[i].from;
             message = pending_message[i].message;
         }
@@ -134,7 +132,7 @@ function otherActivities(data){
 
 //A Custom Push Notification Function Which Can Be Used For Every Other Service To Push Notifications
 function customPushNotification(socketId,message,from,type){
-    io.sockets.connected[socketId].emit("pushMessage",{"message":message,"doer":from,"type":type});
+    io.of('/socket').connected[socketId].emit("pushMessage",{"message":message,"doer":from,"type":type});
 }
 
 //Writes Offline Messages To File
