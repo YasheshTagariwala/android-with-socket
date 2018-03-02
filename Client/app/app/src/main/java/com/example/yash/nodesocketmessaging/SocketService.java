@@ -22,7 +22,7 @@ public class SocketService extends JobService {
                 IO.Options options = new IO.Options();
                 options.reconnection = false;
                 options.reconnectionAttempts = 0;
-                socket = IO.socket(SocketUtils.PROTOCOL + SocketUtils.SERVER_ADDRESS + ":" + SocketUtils.SERVER_PORT + "/", options);
+                socket = IO.socket(SocketUtils.PROTOCOL + SocketUtils.SERVER_ADDRESS, options);
             } catch (Exception e) {
                 e.printStackTrace();
             }

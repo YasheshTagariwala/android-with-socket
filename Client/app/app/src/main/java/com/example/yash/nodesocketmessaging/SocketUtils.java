@@ -7,6 +7,6 @@ package com.example.yash.nodesocketmessaging;
 public class SocketUtils {
 
     public static String PROTOCOL = "http://";
-    public static String SERVER_ADDRESS = "192.168.43.69";
+    public static String SERVER_ADDRESS = "klydo.space/socket";
     public static int SERVER_PORT = 3000;
 }

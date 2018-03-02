@@ -154,7 +154,7 @@ public class SocketClass {
             IO.Options options = new IO.Options();
             options.reconnection = false;
             options.reconnectionAttempts = 0;
-            socket = IO.socket(SocketUtils.PROTOCOL + SocketUtils.SERVER_ADDRESS + ":" + SocketUtils.SERVER_PORT + "/", options);
+            socket = IO.socket(SocketUtils.PROTOCOL + SocketUtils.SERVER_ADDRESS, options);
             socket.connect();
             final SocketClass socketClass = new SocketClass();
             socketClass.SocketInitialize(context, socket);
