@@ -5,7 +5,10 @@ var app = require('express')();
 var server = require('http').Server(app);
 
 //An Socket Object To For All Other Purpose
-var io = require('socket.io')(server);
+var io = require('socket.io')(server,{
+    pingInterval:1000,
+    pingTimeout:2000
+});
 
 //An FileSystem Object For Read Write Operation
 var fs = require('fs');
@@ -21,7 +24,7 @@ var offline_private_message = [];
 
 //Start The Server To On Specific Port eg:- (3000)
 server.listen(3000,() => {
-	console.log("Yep Running");
+    console.log("Yep Running");
 })
 
 const device = io.of('/socket');
@@ -29,26 +32,26 @@ const device = io.of('/socket');
 //Used To Initialize All The Other Socket Event
 device.on('connect',(socket) => {
     onConnect(socket);
-	allListeners(socket);
+    allListeners(socket);
 })
 
 //All Socket Events Function
 function allListeners(socket){
 
     //Private Message Event
-	socket.on('privateMessageEmit',(data) => {
-	    privateMessage(data);
-	});
+    socket.on('privateMessageEmit',(data) => {
+        privateMessage(data);
+    });
 
     //Connection Done Event
-	socket.on('connectedDone',(data) => {
-	    connectionDone(data);
-	});
+    socket.on('connectedDone',(data) => {
+        connectionDone(data);
+    });
 
     //Other Activities Event
-	socket.on('otherActivities',(data) => {
+    socket.on('otherActivities',(data) => {
         otherActivities(data);
-	})
+    })
 
     //Group Message Event
     socket.on('groupMessage',(data) => {
@@ -56,9 +59,9 @@ function allListeners(socket){
     });
 
     //Disconnect Message Event
-	socket.on('disconnect',() => {
+    socket.on('disconnect',() => {
         onDisconnect(socket);
-	});
+    });
 
 }
 
