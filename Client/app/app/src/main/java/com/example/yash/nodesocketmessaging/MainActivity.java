@@ -149,22 +149,28 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void checkScheduler() {
-//        JobScheduler jobScheduler = (JobScheduler) getSystemService(Context.JOB_SCHEDULER_SERVICE);
-//        boolean hasBeenScheduled = false;
-//        for (JobInfo jobInfo : jobScheduler.getAllPendingJobs()) {
-//            if (jobInfo.getId() == JobSchedulerUtils.JOB_ID) {
-//                hasBeenScheduled = true;
-//                break;
-//            }
-//        }
-//
-//        if (!hasBeenScheduled) {
-//            JobSchedulerUtils.scheduleJob(getApplicationContext());
-//        }
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            JobSchedulerUtils.scheduleJobForN(getApplicationContext());
+        JobScheduler jobScheduler = (JobScheduler) getSystemService(Context.JOB_SCHEDULER_SERVICE);
+        boolean hasBeenScheduled = false;
+        for (JobInfo jobInfo : jobScheduler.getAllPendingJobs()) {
+            if (jobInfo.getId() == JobSchedulerUtils.JOB_ID) {
+                hasBeenScheduled = true;
+                break;
+            }
+        }
+
+        if (!hasBeenScheduled) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                JobSchedulerUtils.scheduleJobForN(getApplicationContext());
+            } else {
+                JobSchedulerUtils.scheduleJob(getApplicationContext());
+            }
         } else {
-            JobSchedulerUtils.scheduleJob(getApplicationContext());
+            JobSchedulerUtils.cancleJob(MainActivity.this);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                JobSchedulerUtils.scheduleJobForN(getApplicationContext());
+            } else {
+                JobSchedulerUtils.scheduleJob(getApplicationContext());
+            }
         }
     }
 }

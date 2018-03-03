@@ -154,6 +154,10 @@ public class SocketClass {
             IO.Options options = new IO.Options();
             options.reconnection = false;
             options.reconnectionAttempts = 0;
+            options.reconnectionDelay = 1000;
+            options.reconnectionDelayMax = 2000;
+            options.randomizationFactor = 0.1;
+            options.timeout = 1000;
             socket = IO.socket(SocketUtils.PROTOCOL + SocketUtils.SERVER_ADDRESS, options);
             socket.connect();
             final SocketClass socketClass = new SocketClass();
