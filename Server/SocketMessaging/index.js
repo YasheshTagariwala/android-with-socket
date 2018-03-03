@@ -7,7 +7,7 @@ var server = require('http').Server(app);
 //An Socket Object To For All Other Purpose
 var io = require('socket.io')(server,{
     pingInterval:1000,
-    pingTimeout:2000
+    pingTimeout:1000
 });
 
 //An FileSystem Object For Read Write Operation
@@ -79,7 +79,7 @@ function privateMessage(data){
         offline_private_message.push(data);
         writeMessageToFile(offline_private_message);
     }else{
-        io.of('/socket').connected[user[0].socket_id].emit('privateMessageGet',{"text":data.message});
+        io.of('/socket').connected[user[0].socket_id].emit('privateMessageGet',{"text":data.message,"from":data.from});
         customPushNotification(user[0].socket_id,data.message,data.from,7);
     }
 }
@@ -114,7 +114,7 @@ function connectionDone(data){
     var message = "";
     if(pending_message.length != 0){
         for(var i = 0; i < pending_message.length; i++){
-            io.of('/socket').connected[user.socket_id].emit('privateMessageGet',{"text":pending_message[i].message});
+            io.of('/socket').connected[user.socket_id].emit('privateMessageGet',{"text":pending_message[i].message,"from":pending_message[i].from});
             from = pending_message[i].from;
             message = pending_message[i].message;
         }
