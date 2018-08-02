@@ -54,8 +54,8 @@ function allListeners(socket){
     })
 
     //Group Message Event
-    socket.on('groupMessage',(data) => {
-//        socket.broadcast.emit('groupMessage',data);
+    socket.on('groupMessageEmit',(data) => {
+        groupMessage(data);       
     });
 
     //Disconnect Message Event
@@ -82,6 +82,22 @@ function privateMessage(data){
         io.of('/socket').connected[user[0].socket_id].emit('privateMessageGet',{"text":data.message,"from":data.from});
         customPushNotification(user[0].socket_id,data.message,data.from,7);
     }
+}
+
+//Sends A Group Message To Specific Client With Push Notification
+function groupMessage(data){
+    // socket.broadcast.emit('groupMessage',data);
+    // var data = JSON.parse(data);
+    // var user = users_list.filter((item) => {return item.email == data.to});
+    // if(user.length == 0){
+    //     offline_private_message.push(data);
+    //     writeMessageToFile(offline_private_message);
+    // }else{
+    //     io.of('/socket').broadcast.emit('groupMessageGet',{"text":data.message,"from":data.from});
+    //     customPushNotification(user[0].socket_id,data.message,data.from,7);
+    // }
+     var data = JSON.parse(data);
+    io.of('/socket').emit('groupMessageGet',{"text":data.message,"from":data.from});
 }
 
 //Checks For Any Offline Messages File Exists / Create It
